@@ -3,7 +3,7 @@ const CHAPTERS = [
   { id: 2, title: "第2章 目標設定フェーズ" },
   { id: 3, title: "第3章 計画フェーズ" },
   { id: 4, title: "第4章 実行・修正フェーズ" },
-  { id: 5, title: "追章 開発アプローチとライフサイクル" }
+  { id: 5, title: "第5章 開発アプローチとライフサイクル" }
 ];
 
 const QUESTIONS = [
