@@ -78,6 +78,21 @@
     return QUESTIONS.filter(q => weakIds.includes(q.id));
   }
 
+  function questionStats(questionId) {
+    const list = loadHistory();
+    let attempts = 0;
+    let correct = 0;
+    list.forEach(session => {
+      session.answers.forEach(a => {
+        if (a.questionId === questionId) {
+          attempts += 1;
+          if (a.correct) correct += 1;
+        }
+      });
+    });
+    return { attempts, correct, incorrect: attempts - correct };
+  }
+
   function chapterProgress(chapterId) {
     const map = latestAttemptMap();
     const chapterQuestions = questionsByChapter(chapterId);
@@ -382,11 +397,16 @@
     let feedback = '';
     if (quizState.answered) {
       const isCorrect = quizState.selected === q.correctIndex;
+      const stats = questionStats(q.id); // 今回の解答を保存する前の集計(=これまでの履歴)
+      const historyNote = stats.attempts === 0
+        ? '<span class="hn-new">🆕 はじめて解答する問題です</span>'
+        : `これまで${stats.attempts}回解答 ・ <span class="hn-ok">正解${stats.correct}</span> ・ <span class="hn-ng">不正解${stats.incorrect}</span>`;
       feedback = `
         <div class="feedback-banner ${isCorrect ? 'correct' : 'incorrect'}">
           <div class="fb-title">${isCorrect ? '正解です' : '不正解'}</div>
           <div>${escapeHtml(q.exp || '')}</div>
-        </div>`;
+        </div>
+        <div class="q-history-note">${historyNote}</div>`;
     }
 
     const progressPct = Math.round((idx / total) * 100);
@@ -491,6 +511,10 @@
     return s.questions.map((q, i) => {
       const a = s.answers[i];
       const ok = a && a.correct;
+      const stats = questionStats(q.id); // このセッション分も含めた累計
+      const statsLine = stats.attempts <= 1
+        ? '<span class="rs-new">🆕 はじめての解答</span>'
+        : `解答${stats.attempts}回目 ・ <span class="rs-ok">正解${stats.correct}</span> ・ <span class="rs-ng">不正解${stats.incorrect}</span>`;
       return `
         <div class="review-item" onclick="App.toggleReview(this)">
           <div class="review-item-top">
@@ -498,6 +522,7 @@
             <div class="review-q">Q${i + 1}. ${escapeHtml(q.text)}</div>
             <div class="review-time">${a ? fmtClock(a.timeSec) : '--'}</div>
           </div>
+          <div class="review-stats">${statsLine}</div>
           <div class="review-detail">
             <div class="row">あなたの解答: <span class="${ok ? 'ans-correct' : 'ans-wrong'}">${a ? escapeHtml(q.choices[a.chosenIndex]) : '未解答'}</span></div>
             ${ok ? '' : `<div class="row">正解: <span class="ans-correct">${escapeHtml(q.choices[q.correctIndex])}</span></div>`}

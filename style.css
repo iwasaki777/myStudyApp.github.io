@@ -304,6 +304,18 @@ button {
 .feedback-banner.incorrect { background: var(--red-light); color: #b91c1c; }
 .feedback-banner .fb-title { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; }
 
+.q-history-note {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--gray-bg);
+  font-size: 12.5px;
+  color: var(--text-sub);
+}
+.q-history-note .hn-new { color: var(--blue); font-weight: 700; }
+.q-history-note .hn-ok { color: var(--green); font-weight: 700; }
+.q-history-note .hn-ng { color: var(--red); font-weight: 700; }
+
 .q-footer {
   padding: 12px 20px 22px;
 }
@@ -355,6 +367,10 @@ button {
 .review-icon.ng { color: var(--red); }
 .review-q { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .review-time { color: var(--text-sub); font-size: 11.5px; }
+.review-stats { margin-top: 4px; padding-left: 22px; font-size: 11.5px; color: var(--text-sub); }
+.review-stats .rs-new { color: var(--blue); font-weight: 700; }
+.review-stats .rs-ok { color: var(--green); font-weight: 700; }
+.review-stats .rs-ng { color: var(--red); font-weight: 700; }
 .review-detail {
   margin-top: 10px;
   padding-top: 10px;
