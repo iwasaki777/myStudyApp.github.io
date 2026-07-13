@@ -78,6 +78,21 @@
     return QUESTIONS.filter(q => weakIds.includes(q.id));
   }
 
+  function chapterProgress(chapterId) {
+    const map = latestAttemptMap();
+    const chapterQuestions = questionsByChapter(chapterId);
+    let correct = 0;
+    let answered = 0;
+    chapterQuestions.forEach(q => {
+      const a = map[q.id];
+      if (a) {
+        answered += 1;
+        if (a.correct) correct += 1;
+      }
+    });
+    return { total: chapterQuestions.length, answered, correct, incorrect: answered - correct };
+  }
+
   // ---------- global state ----------
   let state = { screen: 'home' };
   let quizState = null;
@@ -112,11 +127,15 @@
     const weakCount = weakQuestionPool().length;
     const chapterCards = CHAPTERS.map(c => {
       const count = questionsByChapter(c.id).length;
+      const prog = chapterProgress(c.id);
       return `
       <button class="card" onclick="App.goChapterSetup(${c.id})">
         <div class="card-main">
           <div class="card-title">${escapeHtml(c.title)}</div>
           <div class="card-sub">問題バンク${count}問 ・ ランダム${CHAPTER_QUIZ_COUNT}問出題</div>
+          <div class="card-progress">${prog.answered > 0
+            ? `解答済み ${prog.answered}/${prog.total}問 ・ <span class="prog-correct">正解${prog.correct}</span> ・ <span class="prog-wrong">不正解${prog.incorrect}</span>`
+            : 'まだ解答していません'}</div>
         </div>
         <div class="card-chevron">›</div>
       </button>`;
@@ -168,6 +187,7 @@
     const c = CHAPTERS.find(x => x.id === state.chapterId);
     const pool = questionsByChapter(c.id);
     const n = Math.min(CHAPTER_QUIZ_COUNT, pool.length);
+    const prog = chapterProgress(c.id);
     app.innerHTML = `
       ${topbar(c.title, 'App.goHome()')}
       <div class="setup-wrap">
@@ -178,6 +198,12 @@
           <div class="setup-stat"><div class="num">4択</div><div class="lbl">形式</div></div>
           <div class="setup-stat"><div class="num">${pool.length}</div><div class="lbl">問題バンク</div></div>
         </div>
+        ${prog.answered > 0 ? `
+        <div class="progress-summary">
+          <div class="ps-item"><div class="ps-num">${prog.answered}/${prog.total}</div><div class="ps-lbl">解答済み</div></div>
+          <div class="ps-item ok"><div class="ps-num">${prog.correct}</div><div class="ps-lbl">正解</div></div>
+          <div class="ps-item ng"><div class="ps-num">${prog.incorrect}</div><div class="ps-lbl">不正解</div></div>
+        </div>` : ''}
         <button class="primary-btn" onclick="App.startChapterQuiz(${c.id})">開始する</button>
       </div>
     `;
